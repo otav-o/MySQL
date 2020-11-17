@@ -62,3 +62,164 @@ truncate table cursos;
 
 desc cursos;
 select * from cursos;
+
+
+ATÉ AULA 12
+
+select * from cursos
+order by ano desc, nome asc;
+
+select nome, ano, carga from cursos
+order by ano, nome;
+
+select nome, carga, idcurso from cursos 
+where ano = '2016'
+order by carga, idcurso desc;
+
+select nome, carga, ano from cursos
+where ano <= '2015'
+order by ano, nome;
+
+select nome, ano from cursos
+where ano between '2014' and '2016'
+order by ano desc, nome asc;
+
+select nome, ano from cursos
+where ano in ('2014', '2015', '2016');
+
+select * from cursos
+where totaulas > 10 and carga < 30
+order by ano;
+
+select * from cursos
+where nome like '%A%'
+order by idcurso;
+
+select * from cursos;
+
+select nome, idcurso, carga from cursos
+where nome not like '%a%';
+
+update cursos
+set nome = 'PáOO'
+where nome = 'POO';
+
+select * from cursos 
+where nome like 'Ph%P';
+
+update cursos
+set nome = 'Photoshop'
+where idcurso = '3';
+
+use cadastro;
+
+
+-- --------------------------------------------------
+
+select carga from cursos
+group by carga;
+
+select distinct carga from cursos
+group by carga; -- visualmente dá a mesma coisa
+
+SELECT 
+    carga, COUNT(nome)
+FROM
+    cursos
+GROUP BY carga
+ORDER BY COUNT(nome);
+
+use cadastro;
+
+select totaulas, count(*) from cursos
+group by totaulas
+order by totaulas;
+
+select * from cursos
+where totaulas = 30;
+
+select * from cursos
+where totaulas = 12;
+
+select carga, count(nome) from cursos where totaulas = 30
+group by carga;
+
+select carga from cursos order by carga;
+
+select carga, count(carga) from cursos -- pode colocar qualquer campo no count, inclusive *
+group by carga;
+
+select carga, count(nome) from cursos
+group by carga
+having count(nome) > 3;
+
+select ano, count(*) from cursos
+where totaulas > 30
+group by ano 
+having ano > 2013 -- só agrupa quem atende a essa condição
+order by count(*) desc;
+
+'''select carga, count(nome) from cursos
+group by carga
+where count(nome) > 3;'''; -- where é para select
+
+select avg(carga) from cursos;
+
+select carga, count(*) from cursos 
+where ano > 2015
+group by carga
+having carga > (select avg(carga) from cursos);
+
+
+use cadastro;
+describe gafanhotos;
+
+alter table gafanhotos
+add column curso_preferido int first; -- chave estrangeira deve ser do mesmo tipo
+
+alter table gafanhotos
+add foreign key (curso_preferido)
+references cursos (idcurso);
+
+
+select * from gafanhotos;
+
+update gafanhotos
+set curso_preferido = '6' 
+where id = '1';
+
+delete from cursos where idcurso = '6'; -- erro de integridade referencial
+
+delete from cursos where idcurso = '28'; -- aceita apagar pois não tem relacionamento (chave estrangeira)
+
+select * from cursos;
+
+
+
+select nome, curso_preferido from gafanhotos;
+
+select nome, ano from cursos;
+
+select gafanhotos.nome, cursos.nome, gafanhotos.curso_preferido
+from gafanhotos join cursos
+on cursos.idcurso = gafanhotos.curso_preferido
+order by gafanhotos.curso_preferido;
+
+
+select g.nome, c.nome
+from gafanhotos as g inner join cursos as c -- apelido
+on c.idcurso = g.curso_preferido;
+
+select g.nome, c.nome
+from gafanhotos g left outer join cursos c -- dá preferência à tabela gafanhotos (à esquerda)
+on c.idcurso = g.curso_preferido;
+
+select g.nome, c.nome
+from gafanhotos as g right outer join cursos c -- mostra todos os cursos, inclusive os que ninguém prefere
+on c.idcurso = g.curso_preferido;
+
+
+select g.nome, c.nome
+from gafanhotos as g right join cursos as c
+on g.curso_preferido = c.idcurso;
+
