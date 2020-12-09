@@ -1,3 +1,5 @@
+[TOC]
+
 19:26 23/08/2020 
 
 ## Caderno MySQL
@@ -162,7 +164,18 @@ create table pessoas (
 
 - `not nul`l: constraint que obriga o preenchimento
 - nomes entre crases: `` permite espaço e acentuação
-- Chaves primárias: matrícula, CPF. Não podem repetir, não existem duas tuplas iguais.
+- Chaves primárias: matrícula, CPF. Não podem repetir.
+- Também dá: 
+
+```mysql
+matricula int primary key, -- somente se for chave primária simples
+
+alter table professor
+    add constraint pk_aluno primary key(matricula)
+-- ou
+alter table professor
+	modify matricula decimal(5) primary key;
+```
 
 ---
 
@@ -273,7 +286,13 @@ create table if not exists cursos (
 ) default charset = utfbmb4;
 ```
 
-`Unique` é diferente de `primary key`
+- `Unique` é diferente de `primary key`
+
+  - Não pode repetir mas pode ser nulo. Define uma *chave candidata*
+
+  - ```mysql
+    unique(rg, rua, cidade) -- define um conjunto unique
+    ```
 
 `Unsigned`: sem sinal (economiza um byte). Não permite negativo.
 
@@ -323,7 +342,8 @@ limit 2;
 - **Cuidado**: há o risco de modificar várias linhas ao mesmo tempo se não usar o `where` com a chave primária ou utilizar o `limit`
   - É possível modificar todos os cursos que têm 40h, por exemplo, mas é muito perigoso
   - O Workbench, por padrão, só permite modificar uma linha por vez, mesmo que não tenha o limit. Ir em edit -> preferences -> sql editor -> desmarcar a opção atualizações seguras e depois reconectar o banco. Marque novamente quando o projeto for sério.
-
+- Ou: `set sql_safe_updates = 0;`
+  
 - Remover uma linha
 
 ```mysql
@@ -342,6 +362,19 @@ ou `truncate table cursos;`. Mantém os cabeçalhos das colunas normalmente.
 - `drop table` (DDL) vs `truncate table` (DML)
   - `drop table` apaga tudo, até a estrutura
   - `truncate`: apaga os dados mas mantém a tabela
+
+- Chave estrangeira em cascata
+
+```mysql
+alter table aluno
+	add foreign key (codigo_curso) references curso(cod_curso)
+    on delete cascade on update cascade; -- !!!!
+    /*agora, se excluir um curso, o SGBD vai procurar todos os alunos
+    inscritos nele e excluí-los também*/
+    
+    /*update em cascata: mudar o codigo do curso e atualizar a chave estrangeira 
+	em todos os alunos*/
+```
 
 ---
 
@@ -656,6 +689,17 @@ where id = '1';
 ```mysql
 delete from cursos where idcurso = '6'; -- erro de integridade referencial
 ```
+
+- 
+
+```mysql
+alter table aluno
+	add constraint fk_codCurso foreign key (codigo_curso)
+	references curso(cod_Curso)
+;
+```
+
+
 
 #### Join
 
